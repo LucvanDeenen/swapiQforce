@@ -1,0 +1,5 @@
+format:
+    localDate: "d/MM/yyyy"
+swapi:
+    baseUrl: "https://swapi.dev/api/"
+
