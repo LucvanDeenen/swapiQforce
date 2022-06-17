@@ -1,7 +1,6 @@
 package nl.qnh.qforce.controller;
 
 import nl.qnh.qforce.api.out.qforce.QforcePerson;
-import nl.qnh.qforce.domain.Person;
 import nl.qnh.qforce.service.PersonServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
