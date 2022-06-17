@@ -2,10 +2,13 @@ package nl.qnh.qforce.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.qnh.qforce.api.consumed.swapi.SwapiMovie;
 import nl.qnh.qforce.api.consumed.swapi.SwapiPerson;
 import nl.qnh.qforce.api.consumed.swapi.SwapiResource;
-import nl.qnh.qforce.domain.QforcePerson;
+import nl.qnh.qforce.domain.Gender;
 import nl.qnh.qforce.domain.Person;
+import nl.qnh.qforce.domain.PersonImpl;
+import nl.qnh.qforce.mapper.PersonMapper;
 import nl.qnh.qforce.mapper.PersonMapperImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,14 +22,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class QforcePersonService implements PersonService {
+public class PersonServiceImpl implements PersonService {
 
     /**
      * Constructor with passing in the baseUrl from the resources file
      */
-    public QforcePersonService(@Value("${swapi.baseUrl}") String baseUrl) {
+    public PersonServiceImpl(@Value("${swapi.baseUrl}") String baseUrl) {
         this.baseUrl = baseUrl;
     }
+    private final PersonMapper personMapper = new PersonMapperImpl();
 
     /**
      * This could be placed into the PersonService interface
@@ -40,7 +44,6 @@ public class QforcePersonService implements PersonService {
      */
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final PersonMapperImpl personMapper = new PersonMapperImpl();
 
     /**
      * Parameters for setting up the targeted URI
@@ -57,15 +60,19 @@ public class QforcePersonService implements PersonService {
      * API Handlers methods
      */
     @Override
-    public List<QforcePerson> search(String query) {
-        final var URI = baseUrl + target + search + query;
-        final List<SwapiPerson> swapiPeople = objectMapper.convertValue(getResource(URI, new ArrayList<>()), new TypeReference<>() {});
-        return convertPerson(swapiPeople);
-    }
-
-    @Override
     public Optional<Person> get(long id) {
+        final var URI = baseUrl + target + id;
+//        getResource(URI, List<PersonImpl>);
         return Optional.empty();
+    }
+    @Override
+    public List<Person> search(String query) {
+        final var URI = baseUrl + target + search + query;
+
+        final List<SwapiPerson> swapiPeople = objectMapper
+                .convertValue(getResource(URI, new ArrayList<>()), new TypeReference<>() {});
+
+        return convertPerson(swapiPeople);
     }
 
     /**
@@ -87,12 +94,30 @@ public class QforcePersonService implements PersonService {
         }
     }
 
-    /** 
-     * Converting SwapiPerson to Person using the MapStruct 
+    /**
+     * Converting SwapiPerson to Person using the MapStruct
      */
-    private List<QforcePerson> convertPerson(List<SwapiPerson> swapiPersonList) {
-        List<QforcePerson> qforcePeople = new ArrayList<>();
-        swapiPersonList.forEach(swapiPerson -> qforcePeople.add(personMapper.swapiToQforce(swapiPerson)));
-        return qforcePeople;
+    private List<Person> convertPerson(List<SwapiPerson> swapiPeople) {
+        final List<Person> personList = new ArrayList<>();
+
+        for (SwapiPerson swapiPerson : swapiPeople) {
+            final var swapiMovies = getMovies(swapiPerson.getFilms());
+            PersonImpl personImpl = personMapper.swapiToPerson(swapiPerson, swapiMovies);
+            personList.add(personImpl);
+        }
+
+        return personList;
+    }
+
+    private List<SwapiMovie> getMovies(List<String> movies) {
+
+        final List<SwapiMovie> swapiMovies = new ArrayList<>();
+
+        for (String movie : movies) {
+            final var swapiMovie = restTemplate.getForObject(movie, SwapiMovie.class);
+            swapiMovies.add(swapiMovie);
+        }
+
+        return swapiMovies;
     }
 }

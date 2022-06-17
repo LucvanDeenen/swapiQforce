@@ -16,7 +16,7 @@
 
 package nl.qnh.qforce.service;
 
-import nl.qnh.qforce.domain.QforcePerson;
+import nl.qnh.qforce.api.out.qforce.QforcePerson;
 import nl.qnh.qforce.domain.Person;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public interface PersonService {
      * @param query the query string
      * @return the list of persons
      */
-    List<QforcePerson> search(String query);
+    List<Person> search(String query);
 
     /**
      * Returns the person with the provided id.

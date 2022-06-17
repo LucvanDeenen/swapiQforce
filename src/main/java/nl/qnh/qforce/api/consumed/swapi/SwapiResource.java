@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 
-@JsonPropertyOrder({"count", "next", "previous", "results"})
 public class SwapiResource<T> {
-
     @JsonProperty("count")
     private int count;
 

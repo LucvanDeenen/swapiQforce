@@ -1,21 +1,17 @@
 package nl.qnh.qforce.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import nl.qnh.qforce.domain.Gender;
-
 import java.util.List;
 
-public class QforcePerson {
+public class PersonImpl implements Person {
     private long id;
     private String name;
-    @JsonProperty("birth_year")
     private String birthYear;
     private Gender gender;
-    private String height;
-    private String weight;
-
+    private int height;
+    private int weight;
     private List<Movie> movies;
 
+    @Override
     public long getId() {
         return id;
     }
@@ -24,6 +20,7 @@ public class QforcePerson {
         this.id = id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -32,6 +29,7 @@ public class QforcePerson {
         this.name = name;
     }
 
+    @Override
     public String getBirthYear() {
         return birthYear;
     }
@@ -40,6 +38,7 @@ public class QforcePerson {
         this.birthYear = birthYear;
     }
 
+    @Override
     public Gender getGender() {
         return gender;
     }
@@ -48,19 +47,30 @@ public class QforcePerson {
         this.gender = gender;
     }
 
-    public String getHeight() {
+    @Override
+    public Integer getHeight() {
         return height;
     }
 
-    public void setHeight(final String height) {
+    public void setHeight(final int height) {
         this.height = height;
     }
 
-    public String getWeight() {
+    @Override
+    public Integer getWeight() {
         return weight;
     }
 
-    public void setWeight(final String weight) {
+    public void setWeight(final int weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
+    public void setMovies(final List<Movie> movies) {
+        this.movies = movies;
     }
 }
