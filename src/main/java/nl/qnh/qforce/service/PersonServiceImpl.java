@@ -1,21 +1,18 @@
 package nl.qnh.qforce.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.qnh.qforce.api.consumed.swapi.SwapiMovie;
 import nl.qnh.qforce.api.consumed.swapi.SwapiPerson;
 import nl.qnh.qforce.api.consumed.swapi.SwapiResource;
-import nl.qnh.qforce.domain.Gender;
 import nl.qnh.qforce.domain.Person;
-import nl.qnh.qforce.domain.PersonImpl;
 import nl.qnh.qforce.mapper.PersonMapper;
 import nl.qnh.qforce.mapper.PersonMapperImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +27,7 @@ public class PersonServiceImpl implements PersonService {
     public PersonServiceImpl(@Value("${swapi.baseUrl}") String baseUrl) {
         this.baseUrl = baseUrl;
     }
+
     private final PersonMapper personMapper = new PersonMapperImpl();
 
     /**
@@ -43,7 +41,6 @@ public class PersonServiceImpl implements PersonService {
      * return the read or written Json value
      */
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Parameters for setting up the targeted URI
@@ -54,59 +51,74 @@ public class PersonServiceImpl implements PersonService {
      */
     private final String baseUrl;
     private final String target = "people/";
-    private final String search = "?search=";
 
     /**
      * API Handlers methods
      */
     @Override
     public Optional<Person> get(long id) {
-        final var URI = baseUrl + target + id;
-//        getResource(URI, List<PersonImpl>);
-        return Optional.empty();
+
+        final var uri = baseUrl + target + id;
+
+        final SwapiPerson swapiPerson = searchPerson(uri);
+
+        final var person = convertPerson(swapiPerson);
+
+        return Optional.of(person);
     }
+
+    private SwapiPerson searchPerson(String uri) {
+        final var res = restTemplate
+                .exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<SwapiPerson>() {
+                });
+
+        return res.getBody();
+    }
+
     @Override
     public List<Person> search(String query) {
-        final var URI = baseUrl + target + search + query;
+        String search = "?search=";
+        final var uri = baseUrl + target + search + query;
 
-        final List<SwapiPerson> swapiPeople = objectMapper
-                .convertValue(getResource(URI, new ArrayList<>()), new TypeReference<>() {});
+        final List<SwapiPerson> swapiPersons = searchPersons(uri, new ArrayList<>());
 
-        return convertPerson(swapiPeople);
-    }
+        final var persons = new ArrayList<Person>();
 
-    /**
-     * This method takes in a generic input and returns a LinkedHashMap
-     * To handle this a conversion still has to be made
-     */
-    private <T> List<T> getResource(String uri, List<T> resources) {
-        ResponseEntity<SwapiResource<T>> result = restTemplate.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
-        final var body = result.getBody();
-        if (body == null) {
-            return resources;
+        for (SwapiPerson swapiPerson : swapiPersons) {
+            persons.add(convertPerson(swapiPerson));
         }
 
-        resources.addAll(body.getResults());
+        return persons;
+    }
+
+    private List<SwapiPerson> searchPersons(String uri, List<SwapiPerson> swapiPersons) {
+
+        var result = restTemplate
+                .exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<SwapiResource<SwapiPerson>>() {
+                });
+
+        final var body = result.getBody();
+
+        if (body == null) {
+            return swapiPersons;
+        }
+
+        swapiPersons.addAll(body.getResults());
         if (body.getNext() == null) {
-            return resources;
+            return swapiPersons;
         } else {
-            return getResource(body.getNext(), resources);
+            return searchPersons(body.getNext(), swapiPersons);
         }
     }
 
     /**
      * Converting SwapiPerson to Person using the MapStruct
      */
-    private List<Person> convertPerson(List<SwapiPerson> swapiPeople) {
-        final List<Person> personList = new ArrayList<>();
+    private Person convertPerson(SwapiPerson swapiPerson) {
 
-        for (SwapiPerson swapiPerson : swapiPeople) {
-            final var swapiMovies = getMovies(swapiPerson.getFilms());
-            PersonImpl personImpl = personMapper.swapiToPerson(swapiPerson, swapiMovies);
-            personList.add(personImpl);
-        }
+        final var swapiMovies = getMovies(swapiPerson.getFilms());
 
-        return personList;
+        return personMapper.swapiToPerson(swapiPerson, swapiMovies);
     }
 
     private List<SwapiMovie> getMovies(List<String> movies) {

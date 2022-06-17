@@ -11,9 +11,8 @@ import java.util.List;
 @Mapper(uses = MovieMapper.class)
 public interface PersonMapper {
 
-    @Mapping(target = "id", qualifiedByName = "urlToId", source = "swapiPerson.url")
-    @Mapping(target = "weight", qualifiedByName = "integerConversion", source = "swapiPerson.mass")
-    @Mapping(target = "height", qualifiedByName = "integerConversion")
+    @Mapping(target = "id", source = "swapiPerson.url", qualifiedByName = "toId")
+    @Mapping(target = "weight", source = "swapiPerson.mass")
     @Mapping(target = "movies", source = "swapiMovies")
     PersonImpl swapiToPerson(SwapiPerson swapiPerson, List<SwapiMovie> swapiMovies);
 
@@ -25,7 +24,6 @@ public interface PersonMapper {
     })
     Gender toGender(String genderString);
 
-    @Named("integerConversion")
     default int toInt(String numValue) {
         try {
             return Integer.parseInt(numValue);
@@ -34,7 +32,7 @@ public interface PersonMapper {
         }
     }
 
-    @Named("urlToId")
+    @Named("toId")
     default long toId(String url) {
         if (url == null) {
             return 0;
