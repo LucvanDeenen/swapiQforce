@@ -1,11 +1,13 @@
 package nl.qnh.qforce.controller;
 
 import nl.qnh.qforce.api.out.qforce.QforcePerson;
+import nl.qnh.qforce.domain.Person;
 import nl.qnh.qforce.service.PersonServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +15,7 @@ import java.util.Optional;
 @RequestMapping("/persons")
 public class PersonControllerImpl implements PersonController {
     private final PersonServiceImpl personService;
+
     public PersonControllerImpl(PersonServiceImpl personService) {
         this.personService = personService;
     }
@@ -23,9 +26,13 @@ public class PersonControllerImpl implements PersonController {
 
         final var personList = personService.search(q);
 
-        // Transfer to frontend/output format (List<QforcePerson>)
+        List<QforcePerson> qforcePersons = new ArrayList<>();
 
-        return null;
+        for (Person person : personList) {
+            qforcePersons.add(personService.transformPerson(person));
+        }
+
+        return qforcePersons;
     }
 
     @Override
@@ -33,10 +40,7 @@ public class PersonControllerImpl implements PersonController {
     public Optional<QforcePerson> getPerson(@PathVariable final long id) {
         try {
             final var person = personService.get(id);
-
-            // Transfer to frontend/output format (QforcePerson)
-
-            return Optional.empty();
+            return Optional.of(personService.transformPerson(person.get()));
         } catch (Exception exception) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND

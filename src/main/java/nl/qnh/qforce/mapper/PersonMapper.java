@@ -2,8 +2,8 @@ package nl.qnh.qforce.mapper;
 
 import nl.qnh.qforce.api.consumed.swapi.SwapiMovie;
 import nl.qnh.qforce.api.consumed.swapi.SwapiPerson;
-import nl.qnh.qforce.domain.Gender;
-import nl.qnh.qforce.domain.PersonImpl;
+import nl.qnh.qforce.api.out.qforce.QforcePerson;
+import nl.qnh.qforce.domain.*;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -11,6 +11,9 @@ import java.util.List;
 @Mapper(uses = MovieMapper.class)
 public interface PersonMapper {
 
+    /**
+     * SwapiMovie to Movie domain
+     */
     @Mapping(target = "id", source = "swapiPerson.url", qualifiedByName = "toId")
     @Mapping(target = "weight", source = "swapiPerson.mass")
     @Mapping(target = "movies", source = "swapiMovies")
@@ -41,4 +44,10 @@ public interface PersonMapper {
         final var splitUri = url.split("/");
         return Long.parseLong(splitUri[splitUri.length - 1]);
     }
+
+    /**
+     * Movie domain to QforceMovie (Frontend / Output format)
+     */
+    @Mapping(target = "movies", source = "movieList")
+    QforcePerson personToQforce(Person person, List<Movie> movieList);
 }

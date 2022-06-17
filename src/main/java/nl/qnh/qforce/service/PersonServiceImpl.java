@@ -3,16 +3,17 @@ package nl.qnh.qforce.service;
 import nl.qnh.qforce.api.consumed.swapi.SwapiMovie;
 import nl.qnh.qforce.api.consumed.swapi.SwapiPerson;
 import nl.qnh.qforce.api.consumed.swapi.SwapiResource;
+import nl.qnh.qforce.api.out.qforce.QforceMovie;
+import nl.qnh.qforce.api.out.qforce.QforcePerson;
+import nl.qnh.qforce.domain.Movie;
 import nl.qnh.qforce.domain.Person;
 import nl.qnh.qforce.mapper.PersonMapper;
 import nl.qnh.qforce.mapper.PersonMapperImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,10 @@ public class PersonServiceImpl implements PersonService {
         return res.getBody();
     }
 
+    public QforcePerson transformPerson(Person person) {
+        return personMapper.personToQforce(person, person.getMovies());
+    }
+
     @Override
     public List<Person> search(String query) {
         String search = "?search=";
@@ -116,12 +121,12 @@ public class PersonServiceImpl implements PersonService {
      */
     private Person convertPerson(SwapiPerson swapiPerson) {
 
-        final var swapiMovies = getMovies(swapiPerson.getFilms());
+        final var swapiMovies = getSwapiMovies(swapiPerson.getFilms());
 
         return personMapper.swapiToPerson(swapiPerson, swapiMovies);
     }
 
-    private List<SwapiMovie> getMovies(List<String> movies) {
+    private List<SwapiMovie> getSwapiMovies(List<String> movies) {
 
         final List<SwapiMovie> swapiMovies = new ArrayList<>();
 

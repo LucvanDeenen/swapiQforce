@@ -1,11 +1,13 @@
 package nl.qnh.qforce.api.out.qforce;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import nl.qnh.qforce.domain.Gender;
 import nl.qnh.qforce.domain.Movie;
 
 import java.util.List;
 
+@JsonPropertyOrder({"id", "name", "birth_year", "gender", "height", "weight", "movies"})
 public class QforcePerson {
     private long id;
     private String name;
@@ -63,5 +65,13 @@ public class QforcePerson {
 
     public void setWeight(final int weight) {
         this.weight = weight;
+    }
+
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
+    public void setMovies(final List<Movie> movies) {
+        this.movies = movies;
     }
 }
