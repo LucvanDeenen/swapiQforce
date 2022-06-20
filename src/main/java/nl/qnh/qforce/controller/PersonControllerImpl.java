@@ -4,7 +4,9 @@ import nl.qnh.qforce.api.out.qforce.QforcePerson;
 import nl.qnh.qforce.domain.Person;
 import nl.qnh.qforce.service.PersonServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,8 +27,7 @@ public class PersonControllerImpl implements PersonController {
 
     @Override
     @GetMapping
-    public List<QforcePerson> searchPerson(@RequestParam String q) {
-
+    public ResponseEntity<List<QforcePerson>> searchPerson(@RequestParam String q) {
         final var personList = personService.search(q);
 
         List<QforcePerson> qforcePersons = new ArrayList<>();
@@ -35,19 +36,19 @@ public class PersonControllerImpl implements PersonController {
             qforcePersons.add(personService.transformPerson(person));
         }
 
-        return qforcePersons;
+        return new ResponseEntity<>(qforcePersons, HttpStatus.OK);
     }
 
     @Override
     @GetMapping("{id}")
-    public Optional<QforcePerson> getPerson(@PathVariable final long id) {
-        try {
-            final var person = personService.get(id);
-            return Optional.of(personService.transformPerson(person.get()));
-        } catch (Exception exception) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND
-            );
+    public ResponseEntity<QforcePerson> getPerson(@PathVariable final long id) {
+        final var person = personService.get(id);
+
+        if (person.isPresent()) {
+            return new ResponseEntity<>(personService.transformPerson(person.get()), HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }
