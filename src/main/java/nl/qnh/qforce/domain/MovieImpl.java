@@ -1,5 +1,6 @@
 package nl.qnh.qforce.domain;
 
+import javax.persistence.Entity;
 import java.time.LocalDate;
 
 public class MovieImpl implements Movie {

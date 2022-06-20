@@ -1,8 +1,11 @@
 package nl.qnh.qforce.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.List;
 
 public class PersonImpl implements Person {
+
     private long id;
     private String name;
     private String birthYear;

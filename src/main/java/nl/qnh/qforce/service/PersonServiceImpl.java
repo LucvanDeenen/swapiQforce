@@ -28,7 +28,6 @@ public class PersonServiceImpl implements PersonService {
     public PersonServiceImpl(@Value("${swapi.baseUrl}") String baseUrl) {
         this.baseUrl = baseUrl;
     }
-
     private final PersonMapper personMapper = new PersonMapperImpl();
 
     /**
