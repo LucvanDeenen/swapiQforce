@@ -12,6 +12,8 @@ import nl.qnh.qforce.mapper.PersonMapperImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -136,4 +138,25 @@ public class PersonServiceImpl implements PersonService {
 
         return swapiMovies;
     }
+
+    /** Controller Entry Handling */
+    public ResponseEntity<List<QforcePerson>> searchPersonResponseEntity(final String q) {
+        final var personList = search(q);
+
+        List<QforcePerson> qforcePersons = new ArrayList<>();
+
+        for (Person person : personList) {
+            qforcePersons.add(transformPerson(person));
+        }
+
+        return new ResponseEntity<>(qforcePersons, HttpStatus.OK);
+    }
+
+    public ResponseEntity<QforcePerson> getPersonResponseEntity(final long id) {
+        final var person = get(id);
+
+        return person.map(value -> new ResponseEntity<>(transformPerson(value), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
 }
