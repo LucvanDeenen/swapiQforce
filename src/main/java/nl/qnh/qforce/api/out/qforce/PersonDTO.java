@@ -1,14 +1,22 @@
-package nl.qnh.qforce.domain;
+package nl.qnh.qforce.api.out.qforce;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Data;
+import nl.qnh.qforce.domain.Gender;
+import nl.qnh.qforce.domain.Movie;
 
 import java.util.List;
 
 //@Data
-public class PersonImpl implements Person {
+@JsonPropertyOrder({"id", "name", "birth_year", "gender", "height", "weight", "movies"})
+public class PersonDTO {
 
     private long id;
 
     private String name;
 
+    @JsonProperty("birth_year")
     private String birthYear;
 
     private Gender gender;
@@ -19,7 +27,6 @@ public class PersonImpl implements Person {
 
     private List<Movie> movies;
 
-    @Override
     public long getId() {
         return id;
     }
@@ -28,7 +35,6 @@ public class PersonImpl implements Person {
         this.id = id;
     }
 
-    @Override
     public String getName() {
         return name;
     }
@@ -37,7 +43,6 @@ public class PersonImpl implements Person {
         this.name = name;
     }
 
-    @Override
     public String getBirthYear() {
         return birthYear;
     }
@@ -46,7 +51,6 @@ public class PersonImpl implements Person {
         this.birthYear = birthYear;
     }
 
-    @Override
     public Gender getGender() {
         return gender;
     }
@@ -55,8 +59,7 @@ public class PersonImpl implements Person {
         this.gender = gender;
     }
 
-    @Override
-    public Integer getHeight() {
+    public int getHeight() {
         return height;
     }
 
@@ -64,8 +67,7 @@ public class PersonImpl implements Person {
         this.height = height;
     }
 
-    @Override
-    public Integer getWeight() {
+    public int getWeight() {
         return weight;
     }
 
@@ -73,7 +75,6 @@ public class PersonImpl implements Person {
         this.weight = weight;
     }
 
-    @Override
     public List<Movie> getMovies() {
         return movies;
     }

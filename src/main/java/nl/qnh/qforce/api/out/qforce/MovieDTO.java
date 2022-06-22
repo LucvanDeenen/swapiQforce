@@ -1,9 +1,12 @@
-package nl.qnh.qforce.domain;
+package nl.qnh.qforce.api.out.qforce;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.time.LocalDate;
 
 //@Data
-public class MovieImpl implements Movie {
+public class MovieDTO {
 
     private String title;
 
@@ -11,9 +14,9 @@ public class MovieImpl implements Movie {
 
     private String director;
 
+    @JsonProperty("release_date")
     private LocalDate releaseDate;
 
-    @Override
     public String getTitle() {
         return title;
     }
@@ -22,8 +25,7 @@ public class MovieImpl implements Movie {
         this.title = title;
     }
 
-    @Override
-    public Integer getEpisode() {
+    public int getEpisode() {
         return episode;
     }
 
@@ -31,7 +33,6 @@ public class MovieImpl implements Movie {
         this.episode = episode;
     }
 
-    @Override
     public String getDirector() {
         return director;
     }
@@ -40,7 +41,6 @@ public class MovieImpl implements Movie {
         this.director = director;
     }
 
-    @Override
     public LocalDate getReleaseDate() {
         return releaseDate;
     }

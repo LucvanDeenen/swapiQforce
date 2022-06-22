@@ -3,9 +3,7 @@ package nl.qnh.qforce.service;
 import nl.qnh.qforce.api.consumed.swapi.SwapiMovie;
 import nl.qnh.qforce.api.consumed.swapi.SwapiPerson;
 import nl.qnh.qforce.api.consumed.swapi.SwapiResource;
-import nl.qnh.qforce.api.out.qforce.QforceMovie;
-import nl.qnh.qforce.api.out.qforce.QforcePerson;
-import nl.qnh.qforce.domain.Movie;
+import nl.qnh.qforce.api.out.qforce.PersonDTO;
 import nl.qnh.qforce.domain.Person;
 import nl.qnh.qforce.mapper.PersonMapper;
 import nl.qnh.qforce.mapper.PersonMapperImpl;
@@ -77,7 +75,7 @@ public class PersonServiceImpl implements PersonService {
         return res.getBody();
     }
 
-    public QforcePerson transformPerson(Person person) {
+    public PersonDTO transformPerson(Person person) {
         return personMapper.personToQforce(person, person.getMovies());
     }
 
@@ -140,19 +138,19 @@ public class PersonServiceImpl implements PersonService {
     }
 
     /** Controller Entry Handling */
-    public ResponseEntity<List<QforcePerson>> searchPersonResponseEntity(final String q) {
+    public ResponseEntity<List<PersonDTO>> searchPersonResponseEntity(final String q) {
         final var personList = search(q);
 
-        List<QforcePerson> qforcePersons = new ArrayList<>();
+        List<PersonDTO> personDTOS = new ArrayList<>();
 
         for (Person person : personList) {
-            qforcePersons.add(transformPerson(person));
+            personDTOS.add(transformPerson(person));
         }
 
-        return new ResponseEntity<>(qforcePersons, HttpStatus.OK);
+        return new ResponseEntity<>(personDTOS, HttpStatus.OK);
     }
 
-    public ResponseEntity<QforcePerson> getPersonResponseEntity(final long id) {
+    public ResponseEntity<PersonDTO> getPersonResponseEntity(final long id) {
         final var person = get(id);
 
         return person.map(value -> new ResponseEntity<>(transformPerson(value), HttpStatus.OK))

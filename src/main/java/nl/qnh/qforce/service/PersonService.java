@@ -16,7 +16,6 @@
 
 package nl.qnh.qforce.service;
 
-import nl.qnh.qforce.api.out.qforce.QforcePerson;
 import nl.qnh.qforce.domain.Person;
 
 import java.util.List;
