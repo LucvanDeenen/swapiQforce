@@ -2,17 +2,14 @@ package nl.qnh.qforce.api.out.qforce;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import nl.qnh.qforce.domain.Gender;
-import nl.qnh.qforce.domain.Movie;
 
 import java.util.List;
 
+@Data
 @JsonPropertyOrder({"id", "name", "birth_year", "gender", "height", "weight", "movies"})
-@Getter
-@Setter
-public class QforcePerson {
+public class PersonDTO {
 
     private long id;
 
@@ -27,6 +24,6 @@ public class QforcePerson {
 
     private int weight;
 
-    private List<Movie> movies;
+    private List<MovieDTO> movies;
 
 }

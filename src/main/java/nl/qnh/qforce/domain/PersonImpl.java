@@ -1,12 +1,10 @@
 package nl.qnh.qforce.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class PersonImpl implements Person {
 
     private long id;
@@ -17,9 +15,9 @@ public class PersonImpl implements Person {
 
     private Gender gender;
 
-    private int height;
+    private Integer height;
 
-    private int weight;
+    private Integer weight;
 
     private List<Movie> movies;
 

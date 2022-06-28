@@ -1,14 +1,12 @@
 package nl.qnh.qforce.api.out.qforce;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
-public class QforceMovie {
+@Data
+public class MovieDTO {
 
     private String title;
 

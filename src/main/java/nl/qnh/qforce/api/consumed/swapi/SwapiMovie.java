@@ -1,13 +1,11 @@
 package nl.qnh.qforce.api.consumed.swapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class SwapiMovie {
 
     private String title;

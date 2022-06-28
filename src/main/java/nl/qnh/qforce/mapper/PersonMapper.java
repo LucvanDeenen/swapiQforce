@@ -2,7 +2,8 @@ package nl.qnh.qforce.mapper;
 
 import nl.qnh.qforce.api.consumed.swapi.SwapiMovie;
 import nl.qnh.qforce.api.consumed.swapi.SwapiPerson;
-import nl.qnh.qforce.api.out.qforce.QforcePerson;
+import nl.qnh.qforce.api.out.qforce.MovieDTO;
+import nl.qnh.qforce.api.out.qforce.PersonDTO;
 import nl.qnh.qforce.domain.*;
 import org.mapstruct.*;
 
@@ -49,5 +50,5 @@ public interface PersonMapper {
      * Movie domain to QforceMovie (Frontend / Output format)
      */
     @Mapping(target = "movies", source = "movieList")
-    QforcePerson personToQforce(Person person, List<Movie> movieList);
+    PersonDTO personToQforce(Person person, List<Movie> movieList);
 }

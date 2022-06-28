@@ -1,12 +1,9 @@
 package nl.qnh.qforce.api.consumed.swapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -22,9 +19,7 @@ import java.util.Locale;
  * also not necessary.
  */
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class SwapiPerson {
 
     private String name;

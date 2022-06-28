@@ -1,17 +1,15 @@
 package nl.qnh.qforce.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 public class MovieImpl implements Movie {
 
     private String title;
 
-    private int episode;
+    private Integer episode;
 
     private String director;
 
