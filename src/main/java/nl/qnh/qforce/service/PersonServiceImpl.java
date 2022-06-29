@@ -7,6 +7,7 @@ import nl.qnh.qforce.api.out.qforce.PersonDTO;
 import nl.qnh.qforce.domain.Person;
 import nl.qnh.qforce.mapper.PersonMapper;
 import nl.qnh.qforce.mapper.PersonMapperImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -22,12 +23,14 @@ import java.util.Optional;
 @Service
 public class PersonServiceImpl implements PersonService {
 
-    /**
-     * Constructor with passing in the baseUrl from the resources file
-     */
-    public PersonServiceImpl(@Value("${swapi.baseUrl}") String baseUrl) {
+    private final LogService logService;
+
+    @Autowired
+    public PersonServiceImpl(@Value("${swapi.baseUrl}") String baseUrl, LogService logService) {
         this.baseUrl = baseUrl;
+        this.logService = logService;
     }
+
     private final PersonMapper personMapper = new PersonMapperImpl();
 
     /**
@@ -81,6 +84,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public List<Person> search(String query) {
+
         String search = "?search=";
         final var uri = baseUrl + target + search + query;
 
@@ -137,24 +141,43 @@ public class PersonServiceImpl implements PersonService {
         return swapiMovies;
     }
 
-    /** Controller Entry Handling */
+    /**
+     * Controller Entry Handling
+     */
     public ResponseEntity<List<PersonDTO>> searchPersonResponseEntity(final String q) {
-        final var personList = search(q);
+        try {
+            final var personList = search(q);
 
-        List<PersonDTO> personDTOS = new ArrayList<>();
+            List<PersonDTO> personDTOS = new ArrayList<>();
 
-        for (Person person : personList) {
-            personDTOS.add(transformPerson(person));
+            for (Person person : personList) {
+                personDTOS.add(transformPerson(person));
+            }
+
+            logService.logRequest(true, 200, "SEARCH");
+            return new ResponseEntity<>(personDTOS, HttpStatus.OK);
+        } catch (Exception exception) {
+            logService.logRequest(false, 500, "SEARCH");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(personDTOS, HttpStatus.OK);
     }
 
     public ResponseEntity<PersonDTO> getPersonResponseEntity(final long id) {
-        final var person = get(id);
+        try {
+            final var person = get(id);
 
-        return person.map(value -> new ResponseEntity<>(transformPerson(value), HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            return person.map(value -> {
+                        logService.logRequest(true, 200, "GET");
+                        return new ResponseEntity<>(transformPerson(value), HttpStatus.OK);
+                    })
+                    .orElseGet(() -> {
+                        logService.logRequest(false, 404, "GET");
+                        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    });
+        } catch (Exception exception) {
+            logService.logRequest(false, 500, "GET");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
