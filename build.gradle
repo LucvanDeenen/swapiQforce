@@ -58,3 +58,73 @@ tasks.withType(JavaCompile) {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+task assembleBuild {
+    println "Setting up Clean build"
+    dependsOn assemble {clean}
+}
+
+task stopContainer {
+    dependsOn 'assembleBuild'
+    doLast {
+        try {
+            println "Stopping Docker container"
+            exec {
+                commandLine 'docker', 'stop', 'swapi'
+            }
+        } catch (Exception ignored) {
+            println "Docker container not running!"
+        }
+    }
+}
+
+task resetContainer {
+    dependsOn 'stopContainer'
+    doLast {
+        try {
+            println "Removing Docker container"
+            exec {
+                commandLine 'docker', 'rm', 'swapi'
+            }
+        } catch (Exception ignored) {
+            println "No existing Docker container!"
+        }
+    }
+}
+
+task resetImage {
+    dependsOn 'resetContainer'
+    doLast {
+        try {
+            println "Removing Docker image"
+            exec {
+                commandLine 'docker', 'image', 'rm', 'spring-swapi'
+            }
+        } catch (Exception ignored) {
+            println "No existing Docker image!"
+        }
+    }
+}
+
+task deploy {
+    dependsOn 'resetImage'
+    doLast {
+        println "Starting deploy"
+
+        // Build image
+        exec {
+            commandLine 'docker', 'build', '--tag=spring-swapi', '.'
+        }
+
+        // Create container
+        exec {
+            commandLine 'docker', 'run', '-d', '--name=swapi', '-p=6001:8080', 'spring-swapi'
+        }
+
+        // Display overview containers
+        exec {
+            commandLine 'docker', 'container', 'ls', '-a'
+        }
+
+    }
+}
